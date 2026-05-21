@@ -369,15 +369,45 @@ body::before{
 .toast.err{border-color:rgba(230,57,70,.5);}
 
 /* ── Responsive ──────────────────────────────────────── */
-@media(max-width:860px){
-  .main{padding:20px 16px;}
-  .header-inner{padding:0 16px;}
-  .qr-layout{grid-template-columns:1fr;}
-  .qr-sidebar{border-right:none;border-bottom:1px solid var(--border);max-height:220px;}
-  .qr-list-inner{max-height:140px;}
-  .qr-detail-content{grid-template-columns:1fr;}
-  .qr-image-col{border-right:none;border-bottom:1px solid var(--border);flex-direction:row;align-items:flex-start;gap:20px;padding:20px;}
-  .qr-img-wrap{width:140px;height:140px;flex-shrink:0;}
-  .qr-img-actions{flex-direction:row;flex-wrap:wrap;}
-  .campaign-grid{grid-template-columns:1fr;}
+@media(max-width: 860px) {
+  .main { padding: 20px 16px; }
+  .header-inner { padding: 0 16px; }
+  
+  .qr-layout { grid-template-columns: 1fr; }
+  .qr-sidebar { border-right: none; border-bottom: 1px solid var(--border); max-height: 240px; }
+  .qr-list-inner { max-height: 160px; }
+  
+  .qr-detail-content { grid-template-columns: 1fr; }
+  .qr-image-col { 
+    border-right: none; 
+    border-bottom: 1px solid var(--border); 
+    flex-direction: row; 
+    align-items: flex-start; 
+    gap: 20px; 
+    padding: 20px; 
+  }
+  .qr-img-wrap { width: 140px; height: 140px; flex-shrink: 0; }
+  .qr-img-actions { flex-direction: row; flex-wrap: wrap; }
+}
+
+@media(max-width: 580px) {
+  .header-inner { gap: 10px; }
+  .brand-text { display: none; } /* Hide brand text on tiny screens, just show logo */
+  .btn-primary-text { display: none; } /* Add class to HTML to hide text in header button */
+  
+  .view-header { flex-direction: column; gap: 12px; }
+  .view-header-actions { width: 100%; display: flex; }
+  .view-header-actions .btn { flex: 1; justify-content: center; }
+  
+  .qr-info-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+  
+  .qr-image-col { flex-direction: column; align-items: center; text-align: center; }
+  .qr-img-actions { justify-content: center; }
+  
+  .input-row { flex-direction: column; }
+  .input-row .btn { width: 100%; justify-content: center; padding: 12px; }
+  
+  .modal { max-width: calc(100% - 32px); margin: 0 16px; }
+  .modal-ft { flex-direction: column; gap: 8px; }
+  .modal-ft .btn { width: 100%; justify-content: center; }
 }
