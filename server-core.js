@@ -40,7 +40,9 @@ function createApp() {
       }
       // Extract IP and UA for scan tracking
       let ipRaw = req.headers['x-nf-client-connection-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '';
-      const ip = ipRaw.split(',')[0].trim() || 'Unknown';
+      const ips = ipRaw.split(',').map(s => s.trim());
+      // Prefer IPv4 if multiple IPs are present in the proxy chain, fallback to first (which may be IPv6)
+      const ip = ips.find(i => i.includes('.')) || ips[0] || 'Unknown';
       const uaRaw = req.headers['user-agent'] || 'Unknown';
 
       // Parse UA
@@ -70,6 +72,9 @@ function createApp() {
             const geo = await geoRes.json();
             if (geo.status === 'success') {
               location = `${geo.city || ''}, ${geo.region || geo.countryCode || ''}`.replace(/^, | ,$/, '').trim();
+              if (geo.org?.includes('iCloud Private Relay')) {
+                location += ' (Proxy / Private Relay)';
+              }
             }
           }
         } catch (err) {
