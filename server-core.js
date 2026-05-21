@@ -37,9 +37,25 @@ function createApp() {
             <p>No destination URL has been set for this QR code.</p>
           </body></html>`);
       }
-      // Fire-and-forget scan count (non-blocking)
+      // Extract IP and UA for scan tracking
+      const ip = req.headers['x-nf-client-connection-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'Unknown';
+      const ua = req.headers['user-agent'] || 'Unknown';
+
+      // Update scan statistics
       found.entry.scanCount = (found.entry.scanCount || 0) + 1;
       found.entry.lastScanned = new Date().toISOString();
+      
+      // Keep a log of the last 1000 scans
+      found.entry.scans = found.entry.scans || [];
+      found.entry.scans.unshift({
+        timestamp: new Date().toISOString(),
+        ip,
+        ua
+      });
+      if (found.entry.scans.length > 1000) {
+        found.entry.scans = found.entry.scans.slice(0, 1000);
+      }
+
       writeData(data).catch(console.error);
 
       res.redirect(302, found.entry.target);

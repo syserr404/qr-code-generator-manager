@@ -246,6 +246,7 @@ function renderQRDetail(code) {
   $('field-status').className = 'field-status';
 
   renderHistory(entry.history || []);
+  renderScans(entry.scans || []);
   loadQRImage(code);
 }
 
@@ -323,6 +324,20 @@ function renderHistory(history) {
     </div>`).join('');
 }
 
+function renderScans(scans) {
+  const box = $('scans-box');
+  if (!scans.length) {
+    box.innerHTML = '<p class="history-empty-msg">No scans yet.</p>';
+    return;
+  }
+  box.innerHTML = scans.map(s => `
+    <div class="history-item">
+      <div class="history-url" style="color:var(--txt)">IP: ${esc(s.ip || 'Unknown')}</div>
+      <div class="history-date" style="margin-top:2px; font-size:10px; color:var(--txt3)">${esc(s.ua || '')}</div>
+      <div class="history-date" style="margin-top:2px">${fmt(s.timestamp)}</div>
+    </div>`).join('');
+}
+
 // ── Campaign Actions ──────────────────────────────────
 function openCampaignModal(editId) {
   state.editingCampaignId = editId || null;
@@ -369,7 +384,7 @@ $('modal-campaign-submit').addEventListener('click', async () => {
       toast('Campaign created!');
       showQRCodes(res.id);
     }
-  } catch { toast('Failed', 'err'); }
+  } catch (err) { toast(`Failed: ${err.message}`, 'err'); }
   finally { btn.disabled = false; }
 });
 
@@ -416,7 +431,7 @@ $('modal-qr-submit').addEventListener('click', async () => {
     closeQRModal();
     renderQRView();
     toast('QR code created!');
-  } catch { toast('Failed to create QR', 'err'); }
+  } catch (err) { toast(`Failed: ${err.message}`, 'err'); }
   finally { btn.disabled = false; }
 });
 
@@ -444,7 +459,11 @@ $('btn-update').addEventListener('click', async () => {
     renderQRView();
     toast('Redirect updated!');
     setTimeout(() => { status.textContent = ''; }, 4000);
-  } catch { status.textContent = 'Update failed.'; status.className = 'field-status err'; toast('Update failed', 'err'); }
+  } catch (err) { 
+    status.textContent = `Update failed: ${err.message}`; 
+    status.className = 'field-status err'; 
+    toast('Update failed', 'err'); 
+  }
   finally { btn.disabled = false; }
 });
 
