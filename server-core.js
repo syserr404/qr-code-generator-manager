@@ -8,6 +8,7 @@ const QRCode   = require('qrcode');
 const path     = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { readData, writeData } = require('./storage');
+const UAParser = require('ua-parser-js');
 
 function shortId() { return uuidv4().replace(/-/g,'').slice(0, 8); }
 
@@ -38,8 +39,43 @@ function createApp() {
           </body></html>`);
       }
       // Extract IP and UA for scan tracking
-      const ip = req.headers['x-nf-client-connection-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'Unknown';
-      const ua = req.headers['user-agent'] || 'Unknown';
+      let ipRaw = req.headers['x-nf-client-connection-ip'] || req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '';
+      const ip = ipRaw.split(',')[0].trim() || 'Unknown';
+      const uaRaw = req.headers['user-agent'] || 'Unknown';
+
+      // Parse UA
+      const parser = new UAParser(uaRaw);
+      const browser = parser.getBrowser();
+      const os = parser.getOS();
+      const device = parser.getDevice();
+      
+      let deviceStr = 'Unknown Device';
+      if (browser.name) {
+        deviceStr = `${browser.name} ${browser.version ? browser.version.split('.')[0] : ''} on ${os.name || 'Unknown'}`;
+        if (device.type === 'mobile') deviceStr += ' (Mobile)';
+      }
+
+      // Try to get location from IP (with a strict timeout so we don't slow down redirects)
+      let location = 'Unknown Location';
+      if (ip && ip !== 'Unknown' && ip !== '::1' && ip !== '127.0.0.1') {
+        try {
+          // AbortController to enforce 1.5s timeout on geo lookup
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 1500);
+          
+          const geoRes = await fetch(`http://ip-api.com/json/${ip}`, { signal: controller.signal });
+          clearTimeout(timeoutId);
+          
+          if (geoRes.ok) {
+            const geo = await geoRes.json();
+            if (geo.status === 'success') {
+              location = `${geo.city || ''}, ${geo.region || geo.countryCode || ''}`.replace(/^, | ,$/, '').trim();
+            }
+          }
+        } catch (err) {
+          console.error('Geo lookup timeout/error:', err.message);
+        }
+      }
 
       // Update scan statistics
       found.entry.scanCount = (found.entry.scanCount || 0) + 1;
@@ -50,7 +86,9 @@ function createApp() {
       found.entry.scans.unshift({
         timestamp: new Date().toISOString(),
         ip,
-        ua
+        location,
+        ua: deviceStr,
+        rawUa: uaRaw
       });
       if (found.entry.scans.length > 1000) {
         found.entry.scans = found.entry.scans.slice(0, 1000);
