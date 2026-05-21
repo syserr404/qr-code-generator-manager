@@ -281,18 +281,32 @@ function loadQRImage(code) {
     // Overlay logo client-side
     const logo = new Image();
     logo.onload = () => {
-      const logoSize  = Math.round(size * 0.22);
-      const padding   = Math.round(logoSize * 0.15);
-      const padded    = logoSize + padding * 2;
-      const x         = Math.round((size - padded) / 2);
-      const y         = Math.round((size - padded) / 2);
-
-      // White background square
+      // Create a white square in the middle
+      const maxLogoSize = Math.round(size * 0.22);
+      const padding = Math.round(maxLogoSize * 0.15);
+      const paddedSquareSize = maxLogoSize + padding * 2;
+      const squareX = Math.round((size - paddedSquareSize) / 2);
+      const squareY = Math.round((size - paddedSquareSize) / 2);
+      
       ctx.fillStyle = '#ffffff';
-      ctx.fillRect(x, y, padded, padded);
+      ctx.fillRect(squareX, squareY, paddedSquareSize, paddedSquareSize);
 
-      // Logo centred on the white square
-      ctx.drawImage(logo, x + padding, y + padding, logoSize, logoSize);
+      // Draw the logo maintaining aspect ratio inside the maxLogoSize bounding box
+      let drawW = maxLogoSize;
+      let drawH = maxLogoSize;
+      if (logo.naturalWidth && logo.naturalHeight) {
+        const ratio = logo.naturalWidth / logo.naturalHeight;
+        if (ratio > 1) { // wider than tall
+          drawH = maxLogoSize / ratio;
+        } else { // taller than wide
+          drawW = maxLogoSize * ratio;
+        }
+      }
+      
+      const drawX = squareX + padding + (maxLogoSize - drawW) / 2;
+      const drawY = squareY + padding + (maxLogoSize - drawH) / 2;
+      
+      ctx.drawImage(logo, drawX, drawY, drawW, drawH);
 
       wrap.appendChild(canvas);
       spinner.classList.add('hidden');
