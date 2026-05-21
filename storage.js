@@ -62,8 +62,14 @@ function localWrite(data) {
 // ── Public API ────────────────────────────────────────────────────────────────
 
 async function readData() {
-  if (USE_GIST) return gistRead();
-  return localRead();
+  let data;
+  if (USE_GIST) data = await gistRead();
+  else data = localRead();
+  
+  // Ensure the campaigns object always exists even if the file was just {}
+  if (!data) data = {};
+  if (!data.campaigns) data.campaigns = {};
+  return data;
 }
 
 async function writeData(data) {
