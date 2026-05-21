@@ -9,37 +9,42 @@ async function processImage() {
   // 1. Copy the full image to favicon.png
   await fs.promises.copyFile(sourcePath, 'public/favicon.png');
 
-  // 2. Crop the shield.
+  // We can scan to find the exact bounding box for the shield
   const width = image.bitmap.width;
   const height = image.bitmap.height;
   
-  let splitY = height;
   let startedShield = false;
+  let splitY = height;
   
+  // Find bottom of shield
   for (let y = 0; y < height; y++) {
     let rowHasAlpha = false;
     for (let x = 0; x < width; x++) {
-      const color = image.getPixelColor(x, y);
-      // In Jimp, color is RGBA (32-bit int), so alpha is the lowest 8 bits.
-      const alpha = color & 0xFF;
-      if (alpha > 10) {
-        rowHasAlpha = true;
-        break;
-      }
+      if ((image.getPixelColor(x, y) & 0xFF) > 10) { rowHasAlpha = true; break; }
     }
-    
-    if (rowHasAlpha) {
-      startedShield = true;
-    } else if (startedShield && !rowHasAlpha) {
-      splitY = y;
-      break;
-    }
+    if (rowHasAlpha) startedShield = true;
+    else if (startedShield && !rowHasAlpha) { splitY = y; break; }
   }
   
-  console.log(`Found split at Y: ${splitY} out of ${height}`);
+  // Find minX, maxX, minY of the shield area
+  let minX = width, maxX = 0, minY = splitY;
+  for (let y = 0; y < splitY; y++) {
+    let rowHasAlpha = false;
+    for (let x = 0; x < width; x++) {
+      if ((image.getPixelColor(x, y) & 0xFF) > 10) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        rowHasAlpha = true;
+      }
+    }
+    if (rowHasAlpha && y < minY) minY = y;
+  }
+  
+  const cropW = maxX - minX + 1;
+  const cropH = splitY - minY;
   
   const shield = image.clone();
-  shield.crop({ x: 0, y: 0, w: width, h: splitY });
+  shield.crop({ x: minX, y: minY, w: cropW, h: cropH });
   
   const outBuffer = await shield.getBuffer('image/png');
   fs.writeFileSync('public/logo.png', outBuffer);
