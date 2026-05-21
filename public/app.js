@@ -333,16 +333,18 @@ function renderScans(scans) {
   box.innerHTML = scans.map(s => `
     <div class="history-item" style="padding: 10px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 4px;">
       <div style="display: flex; justify-content: space-between; align-items: baseline;">
-        <span style="color:var(--txt); font-weight: 500;">${esc(s.ip || 'Unknown IP')}</span>
-        <span style="color:var(--txt3); font-size:11px;">${fmt(s.timestamp)}</span>
+        <span style="color:var(--txt); font-weight: 500; display: flex; align-items: center; gap: 4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          ${esc(s.location || 'Unknown Location')}
+        </span>
+        <span style="color:var(--txt3); font-size:11px; white-space: nowrap; margin-left: 8px;">${fmt(s.timestamp)}</span>
       </div>
       <div style="font-size:12px; color:var(--txt2); display: flex; align-items: center; gap: 4px;">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
-        ${esc(s.location || 'Unknown Location')}
-      </div>
-      <div style="font-size:11px; color:var(--txt3); display: flex; align-items: center; gap: 4px;">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg>
         ${esc(s.ua || 'Unknown Device')}
+      </div>
+      <div style="font-size:11px; color:var(--txt3); font-family: 'JetBrains Mono', monospace;">
+        ${esc(s.ip || 'Unknown IP')}
       </div>
     </div>`).join('');
 }
