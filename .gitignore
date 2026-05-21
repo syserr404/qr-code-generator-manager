@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Local environment — DO NOT commit real secrets
+.env
+
+# Local data file (Netlify uses GitHub Gist instead)
+redirects.json
+
+# Test/debug scripts
+test-qr.js
+inspect-jimp.js
+test-qr-output.png
+test-out.png
+setup.js
+
+# OS
+.DS_Store
+Thumbs.db

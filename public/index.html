@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Xduce QR Manager — Manage campaigns and dynamic QR codes"/>
+  <title>Xduce QR Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ══ Header ═══════════════════════════════════════════════════ -->
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <img src="logo.png" alt="Xduce" class="brand-logo"/>
+      <div class="brand-text">
+        <span class="brand-name">Xduce</span>
+        <span class="brand-sub">QR Manager</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="breadcrumb" id="breadcrumb">
+        <span class="bc-item bc-active" data-view="campaigns">All Campaigns</span>
+      </div>
+      <button class="btn btn-primary" id="btn-primary-action">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Campaign
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ══ Main ══════════════════════════════════════════════════════ -->
+<main class="main" id="main">
+
+  <!-- ── VIEW: Campaigns Dashboard ─────────────────────────────── -->
+  <div id="view-campaigns" class="view active">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">Campaigns</h1>
+        <p class="view-subtitle">Each campaign can contain multiple QR codes with independent redirect URLs.</p>
+      </div>
+    </div>
+    <div class="campaign-grid" id="campaign-grid">
+      <div class="campaigns-empty" id="campaigns-empty" style="display:none;">
+        <div class="empty-icon-lg">
+          <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5" width="56" height="56">
+            <rect x="6" y="6" width="14" height="14" rx="2"/><rect x="28" y="6" width="14" height="14" rx="2"/>
+            <rect x="6" y="28" width="14" height="14" rx="2"/><rect x="28" y="28" width="7" height="7" rx="1"/>
+            <rect x="38" y="28" width="4" height="4" rx="0.5"/><rect x="28" y="38" width="4" height="4" rx="0.5"/>
+            <rect x="36" y="36" width="6" height="6" rx="1"/>
+          </svg>
+        </div>
+        <h3>No campaigns yet</h3>
+        <p>Create your first campaign to start generating dynamic QR codes.</p>
+        <button class="btn btn-primary" id="btn-empty-create">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Create Campaign
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW: QR Codes inside a Campaign ──────────────────────── -->
+  <div id="view-qrcodes" class="view" style="display:none;">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title" id="campaign-view-name">Campaign</h1>
+        <p class="view-subtitle" id="campaign-view-desc"></p>
+      </div>
+      <div class="view-header-actions">
+        <button class="btn btn-outline btn-sm" id="btn-edit-campaign">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Edit
+        </button>
+        <button class="btn btn-danger-outline btn-sm" id="btn-delete-campaign">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+          Delete Campaign
+        </button>
+      </div>
+    </div>
+
+    <!-- QR List + Detail split -->
+    <div class="qr-layout">
+      <!-- Left: QR list -->
+      <aside class="qr-sidebar">
+        <div class="qr-sidebar-header">
+          <span class="sidebar-label">QR Codes</span>
+          <span class="qr-badge" id="qr-badge">0</span>
+        </div>
+        <div class="qr-list-inner" id="qr-list-inner">
+          <div class="qr-empty" id="qr-empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <p>No QR codes yet</p>
+            <p class="hint">Click "+ Add QR Code" below</p>
+          </div>
+        </div>
+        <button class="btn-add-qr" id="btn-add-qr">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Add QR Code
+        </button>
+      </aside>
+
+      <!-- Right: QR Detail -->
+      <section class="qr-detail" id="qr-detail">
+        <div class="qr-placeholder" id="qr-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" width="52" height="52"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="3" height="3"/><rect x="19" y="14" width="2" height="2"/><rect x="14" y="19" width="2" height="2"/><rect x="18" y="18" width="3" height="3"/></svg>
+          <h3>Select a QR code</h3>
+          <p>Pick one from the list or add a new one.</p>
+        </div>
+
+        <div class="qr-detail-content" id="qr-detail-content" style="display:none;">
+          <!-- QR Image Column -->
+          <div class="qr-image-col">
+            <div class="qr-img-wrap" id="qr-img-wrap">
+              <img id="qr-img" src="" alt="QR Code" class="qr-img"/>
+              <div class="qr-spinner-wrap" id="qr-spinner-wrap">
+                <div class="spinner"></div>
+              </div>
+            </div>
+            <div class="qr-img-actions">
+              <button class="btn btn-outline btn-sm" id="btn-download">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download
+              </button>
+              <button class="btn btn-outline btn-sm" id="btn-copy-url">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                Copy URL
+              </button>
+            </div>
+          </div>
+
+          <!-- Info Column -->
+          <div class="qr-info-col">
+            <div class="qr-info-header">
+              <div>
+                <h2 class="qr-name" id="qr-name-display">—</h2>
+                <div class="qr-meta-row">
+                  <span id="qr-scans">0 scans</span>
+                  <span class="dot">·</span>
+                  <span id="qr-created-date">—</span>
+                </div>
+              </div>
+              <button class="btn btn-danger-outline btn-sm" id="btn-delete-qr">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H8L5 6"/><path d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+                Delete
+              </button>
+            </div>
+
+            <div class="field-grp">
+              <label class="field-lbl">Fixed QR URL <span class="badge-green">Never changes</span></label>
+              <div class="mono-display" id="fixed-url-display">—</div>
+            </div>
+
+            <div class="field-grp">
+              <label class="field-lbl" for="inp-target">Destination URL</label>
+              <div class="input-row">
+                <input type="url" id="inp-target" class="inp" placeholder="https://"/>
+                <button class="btn btn-primary" id="btn-update">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  Update
+                </button>
+              </div>
+              <div class="field-status" id="field-status"></div>
+            </div>
+
+            <div class="field-grp">
+              <label class="field-lbl" for="inp-qr-label">Label</label>
+              <div class="input-row">
+                <input type="text" id="inp-qr-label" class="inp" placeholder="e.g. Main Website, Promo Banner"/>
+                <button class="btn btn-outline btn-sm" id="btn-save-label">Save</button>
+              </div>
+            </div>
+
+            <div class="field-grp">
+              <label class="field-lbl">Redirect History</label>
+              <div class="history-box" id="history-box">
+                <p class="history-empty-msg">No changes yet.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══ Modal: New/Edit Campaign ══════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-campaign-backdrop">
+  <div class="modal" id="modal-campaign">
+    <div class="modal-hd">
+      <h3 id="modal-campaign-title">New Campaign</h3>
+      <button class="modal-x" id="modal-campaign-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-grp">
+        <label class="field-lbl" for="inp-camp-name">Campaign Name <span class="req">*</span></label>
+        <input type="text" id="inp-camp-name" class="inp" placeholder="e.g. Q2 2026 Product Launch"/>
+      </div>
+      <div class="field-grp">
+        <label class="field-lbl" for="inp-camp-desc">Description <span class="opt">(optional)</span></label>
+        <input type="text" id="inp-camp-desc" class="inp" placeholder="Short note about this campaign"/>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="modal-campaign-cancel">Cancel</button>
+      <button class="btn btn-primary" id="modal-campaign-submit">Create Campaign</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Modal: New QR Code ════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-qr-backdrop">
+  <div class="modal" id="modal-qr">
+    <div class="modal-hd">
+      <h3>Add QR Code</h3>
+      <button class="modal-x" id="modal-qr-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-grp">
+        <label class="field-lbl" for="inp-qr-new-label">Label <span class="req">*</span></label>
+        <input type="text" id="inp-qr-new-label" class="inp" placeholder="e.g. Homepage, Brochure A, Booth Banner"/>
+      </div>
+      <div class="field-grp">
+        <label class="field-lbl" for="inp-qr-new-target">Initial Destination URL <span class="opt">(optional)</span></label>
+        <input type="url" id="inp-qr-new-target" class="inp" placeholder="https://"/>
+        <p class="field-hint">You can set or change this anytime.</p>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn btn-ghost" id="modal-qr-cancel">Cancel</button>
+      <button class="btn btn-primary" id="modal-qr-submit">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Generate QR Code
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ Toast ══════════════════════════════════════════════════════ -->
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

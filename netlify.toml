@@ -1,0 +1,25 @@
+[build]
+  publish   = "public"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# Route all API calls and redirect hits to the Express function
+[[redirects]]
+  from   = "/api/*"
+  to     = "/.netlify/functions/api"
+  status = 200
+  force  = true
+
+[[redirects]]
+  from   = "/r/*"
+  to     = "/.netlify/functions/api"
+  status = 200
+  force  = true
+
+# Serve the SPA for everything else
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
