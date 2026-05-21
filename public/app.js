@@ -282,8 +282,8 @@ function loadQRImage(code) {
     const logo = new Image();
     logo.onload = () => {
       // Create a white square in the middle
-      const maxLogoSize = Math.round(size * 0.22);
-      const padding = Math.round(maxLogoSize * 0.15);
+      const maxLogoSize = Math.round(size * 0.26); // Increased shield size
+      const padding = Math.round(maxLogoSize * 0.04); // Reduced white space around shield
       const paddedSquareSize = maxLogoSize + padding * 2;
       const squareX = Math.round((size - paddedSquareSize) / 2);
       const squareY = Math.round((size - paddedSquareSize) / 2);
